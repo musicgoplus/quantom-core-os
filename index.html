@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANTUM | CORE OS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="env-loader.js"></script>
+</head>
+<body>
+    <div class="bg-scanline"></div>
+    
+    <!-- AUTH PAGE -->
+    <div id="auth-page" class="auth-page active">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <h1 class="glitch-text" style="font-size: 2.5rem; margin-bottom: 10px;">QUANTUM</h1>
+                    <p style="color: var(--primary); letter-spacing: 2px;">CORE OS ACCESS</p>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <div id="login-form" class="auth-form active">
+                    <h2>LOGIN TO SYSTEM</h2>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label>EMAIL ADDRESS</label>
+                            <input type="email" id="login-email" placeholder="user@example.com" class="input-cyber" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PASSWORD</label>
+                            <input type="password" id="login-password" placeholder="••••••••" class="input-cyber" required>
+                        </div>
+                        <button type="submit" class="btn-cyber-main" style="width: 100%; padding: 12px;">AUTHENTICATE</button>
+                        <p style="text-align: center; margin-top: 15px; color: var(--text);">
+                            No account? <button type="button" class="link-btn" onclick="switchForm('signup')">REGISTER</button>
+                        </p>
+                    </form>
+                    <div id="login-error" class="error-message"></div>
+                </div>
+
+                <!-- SIGNUP FORM -->
+                <div id="signup-form" class="auth-form">
+                    <h2>CREATE NEW ACCOUNT</h2>
+                    <form onsubmit="handleSignup(event)">
+                        <div class="form-group">
+                            <label>USERNAME</label>
+                            <input type="text" id="signup-username" placeholder="your_username" class="input-cyber" required>
+                        </div>
+                        <div class="form-group">
+                            <label>EMAIL ADDRESS</label>
+                            <input type="email" id="signup-email" placeholder="user@example.com" class="input-cyber" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PASSWORD</label>
+                            <input type="password" id="signup-password" placeholder="••••••••" class="input-cyber" required>
+                        </div>
+                        <div class="form-group">
+                            <label>CONFIRM PASSWORD</label>
+                            <input type="password" id="signup-confirm" placeholder="••••••••" class="input-cyber" required>
+                        </div>
+                        <button type="submit" class="btn-cyber-main" style="width: 100%; padding: 12px;">CREATE ACCOUNT</button>
+                        <p style="text-align: center; margin-top: 15px; color: var(--text);">
+                            Have an account? <button type="button" class="link-btn" onclick="switchForm('login')">LOGIN</button>
+                        </p>
+                    </form>
+                    <div id="signup-error" class="error-message"></div>
+                </div>
+
+                <!-- SUCCESS MESSAGE & CONTINUE BUTTON -->
+                <div id="auth-success" class="auth-form" style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>AUTHENTICATION SUCCESSFUL</h2>
+                    <p style="color: var(--text); margin: 20px 0;">Welcome to QUANTUM CORE OS</p>
+                    <button class="btn-cyber-main" onclick="continueToMain()" style="width: 100%; padding: 12px; font-size: 1.1rem;">
+                        <i class="fas fa-arrow-right"></i> CONTINUE TO SYSTEM
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar">
+        <div class="sidebar-header" style="padding: 20px;"> 
+            <span class="brand-title" style="color: var(--primary); font-weight: 900; letter-spacing: 2px;">QUANTUM CORE</span>
+        </div>
+        <nav class="sidebar">
+    <div class="sidebar-header" style="padding: 20px;"> 
+        <span class="brand-title">QUANTUM CORE</span>
+    </div>
+    
+    <div class="nav-container" style="display: flex; flex-direction: column; height: 100%;">
+        <ul class="nav-links" style="list-style: none; padding: 20px; flex-grow: 1;">
+            <li><button class="nav-btn" onclick="showSection('dashboard')"><i class="fas fa-terminal"></i> DASHBOARD</button></li>
+            <li><button class="nav-btn" onclick="showSection('shelf-view')"><i class="fas fa-project-diagram"></i> NODES</button></li>
+            <li><button class="nav-btn" onclick="showSection('database')"><i class="fas fa-database"></i> DATA</button></li>
+            <li style="margin-top: 20px;"><button class="nav-btn" onclick="toggleTheme()"><i class="fas fa-adjust"></i> COLOR SYNC</button></li>
+            <li style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);"><button class="nav-btn" onclick="logout()" style="color: #ff4d4d;"><i class="fas fa-sign-out-alt"></i> LOGOUT</button></li>
+        </ul>
+
+        <div class="sidebar-footer" style="padding: 20px; font-size: 0.8rem; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2);">
+            <div id="live-date"></div>
+            <div id="live-clock">00:00:00</div>
+        </div>
+    </div>
+</nav>
+    </nav>
+
+    <div class="main-container" id="main-container" style="display: none;">
+        <section id="dashboard" class="content-section active">
+            <h1 class="glitch-text">COMMAND CENTER</h1>
+            <div class="stat-container">
+                <div class="stat-card"><span>NODES</span><h2 id="stat-racks">0</h2></div>
+                <div class="stat-card"><span>BLOCKS</span><h2 id="stat-boxes">0</h2></div>
+                <div class="stat-card"><span>RECORDS</span><h2 id="stat-files">0</h2></div>
+            </div>
+
+            <div class="card-cyber sticky-module" style="margin-top: 30px;">
+    <h3 style="color: var(--primary); margin-bottom: 20px;">
+        <i class="fas fa-sticky-note"></i> NEURAL NOTES & URGENT TASKS
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+        <div class="note-input-zone">
+            <textarea id="note-text" placeholder="ENTER CORE MEMORY..." class="input-cyber" style="height: 120px; resize: none;"></textarea>
+            <button class="btn-cyber-main" onclick="addStickyNote()" style="width: 100%;">PIN TO CORE</button>
+        </div>
+
+        <div id="sticky-notes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-height: 250px; overflow-y: auto;">
+            </div>
+    </div>
+</div>
+        </section>
+
+        <section id="shelf-view" class="content-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+                <h1>STORAGE NODES</h1>
+                <button class="btn-cyber-main" onclick="addNode()">ADD NODE</button>
+            </div>
+            <div id="shelf-grid" class="info-grid"></div>
+        </section>
+
+        <section id="single-shelf-view" class="content-section">
+            <div style="display:flex; gap: 20px; align-items: center; margin-bottom: 30px;">
+                <button class="btn-cyber-main" onclick="currentRackId=null; showSection('shelf-view')">BACK</button>
+                <h1 id="current-rack-title">NODE DETAIL</h1>
+            </div>
+            <div id="box-grid" class="info-grid"></div>
+        </section>
+
+        <section id="box-detail-view" class="content-section">
+            <div style="display:flex; gap: 20px; align-items: center; margin-bottom: 30px;">
+                <button class="btn-cyber-main" onclick="currentBoxId=null; showSection('single-shelf-view')">BACK</button>
+                <h1 id="box-num-display">BLOCK DETAIL</h1>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px;">
+                <div class="card-cyber">
+                    <h3>NEW DATA ENTRY</h3>
+                    <input type="text" id="file-number" placeholder="REF ID" class="input-cyber">
+                    <input type="text" id="full-name" placeholder="SUBJECT NAME" class="input-cyber">
+                    <input type="text" id="entry-label" placeholder="LABEL" class="input-cyber">
+                    <input type="date" id="entry-date" class="input-cyber">
+                    <button class="btn-cyber-main" onclick="addFile()" style="width:100%; margin-top: 15px;">COMMIT</button>
+                </div>
+                <div class="card-cyber">
+                    <h3>BLOCK CONTENTS</h3>
+                    <div id="current-box-list" class="scroll-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="database" class="content-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h1>DATA RECORDS</h1>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn-cyber-main" onclick="exportToCSV()"><i class="fas fa-file-export"></i> CSV</button>
+                    <button class="btn-cyber-main" onclick="printTable()"><i class="fas fa-print"></i> PRINT</button>
+                </div>
+            </div>
+            <input type="text" id="ledger-search" placeholder="SEARCH RECORDS..." class="input-cyber" onkeyup="searchLedger()">
+            <div class="card-cyber" style="overflow-x: auto;">
+                <table class="monitor-table">
+                    <thead>
+                        <tr>
+                            <th>BLOCK</th><th>NODE</th><th>DATE</th><th>ID</th><th>SUBJECT</th><th>LABEL</th><th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="db-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
